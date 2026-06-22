@@ -4,10 +4,22 @@ import path from 'path'
 
 export const uploadToGoogleDrive = async ({ doc }: { doc: any }) => {
   try {
-    const auth = new google.auth.GoogleAuth({
-      keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-      scopes: ['https://www.googleapis.com/auth/drive.file'],
-    })
+    let auth
+
+    if (process.env.GOOGLE_CREDENTIALS_JSON) {
+      // Vercel
+      const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON)
+      auth = new google.auth.GoogleAuth({
+        credentials,
+        scopes: ['https://www.googleapis.com/auth/drive.file'],
+      })
+    } else {
+      // Local
+      auth = new google.auth.GoogleAuth({
+        keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+        scopes: ['https://www.googleapis.com/auth/drive.file'],
+      })
+    }
 
     const drive = google.drive({ version: 'v3', auth })
 
